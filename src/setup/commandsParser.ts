@@ -4,7 +4,7 @@ import { CommandRequest, CommandResponse } from "../bridges/base";
 const commands: Record<string, CommandEntry> = {}
 
 export interface CommandEntry {
-	execute: (request: CommandRequest) => Promise<CommandResponse>,
+	execute: (request: CommandRequest, args?: string[]) => Promise<CommandResponse>,
 	arguments?: string[],
 	description?: string,
 	isAdmin?: boolean,

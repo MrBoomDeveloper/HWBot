@@ -12,4 +12,8 @@ export class DiscordBridge implements Bridge {
 	sendResponse(reponse: CommandResponse): Promise<void> {
 		throw new Error("Method not implemented.");
 	}
+
+	getPrefix(): string | string[] {
+		return ["/", "hw!"];
+	}
 }

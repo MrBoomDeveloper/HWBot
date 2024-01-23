@@ -1,8 +1,10 @@
 import { getCommand } from "../setup/commandsParser";
+import { parseCommand } from "../util/parser";
 
 export interface Bridge {
 	start(): Promise<void>;
-	sendResponse(reponse: CommandResponse): Promise<void>
+	sendResponse(reponse: CommandResponse): Promise<void>,
+	getPrefix(): string | string[]
 }
 
 interface BaseCommand {
@@ -41,10 +43,25 @@ export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
 		return;
 	}
 
-	const foundCommand = getCommand(request.message.text);
+	console.log(`Сообщение от ${request.author.name} (${request.author.id}): ${request.message.text}`);
+
+	if(request.message.text == null) {
+		return;
+	}
+
+	const parsedCommand = parseCommand(request.message.text, bridge.getPrefix());
+
+	if(parsedCommand == null || parsedCommand.length == 0) {
+		return;
+	}
+
+	const foundCommand = getCommand(parsedCommand[0].toLowerCase());
+
+	const args = [...parsedCommand];
+	args.shift();
 
 	const response: CommandResponse = (foundCommand != null)
-		? await foundCommand.execute(request) : {
+		? await foundCommand.execute(request, args) : {
 			replyTo: request.message.id,
 
 			message: {

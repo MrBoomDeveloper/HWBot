@@ -16,7 +16,9 @@ export class TelegramBridge implements Bridge {
 	async start() {
 		this.client = new TelegramBot(this.token, { polling: true });
 
-		this.client.on("message", async (message) => resolveRequest(this, this.getRequest(message)));
+		this.client.on("message", async (message) => {
+			resolveRequest(this, this.getRequest(message));
+		});
 
 		this.client.on("polling_error", (error) => {
 			if(error.message == CLONE_INSTANCE_ERROR) {
@@ -50,6 +52,10 @@ export class TelegramBridge implements Bridge {
 				id: message.chat.id
 			}
 		};
+	}
+
+	getPrefix(): string | string[] {
+		return "/";
 	}
 }
 
