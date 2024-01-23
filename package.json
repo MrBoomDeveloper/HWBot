@@ -6,7 +6,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "npm run dev",
-    "dev": "tsx ./ --watch",
+    "dev": "tsx watch ./",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,6 +20,12 @@
   },
   "homepage": "https://github.com/MrBoomDeveloper/HWBot#readme",
   "devDependencies": {
+    "@types/node-telegram-bot-api": "^0.64.2",
     "tsx": "^4.7.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.2",
+    "express": "^4.18.2",
+    "node-telegram-bot-api": "^0.64.0"
   }
 }

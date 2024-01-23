@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"allowJs": true,
+
+		"lib": ["ES2023"],
+
+		"paths": {
+			"@src/*": ["./*"],
+			"@web/*": ["./src/web/*"],
+			"@commands/*": ["./src/commands/*"],
+			"@bridges/*": ["./src/bridges/*"],
+			"@setup/*": ["./src/setup/*"]
+		}
+	}
+}
