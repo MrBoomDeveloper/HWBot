@@ -1,0 +1,25 @@
+{
+  "name": "dz",
+  "version": "1.0.0",
+  "description": "Mastur bum vs MrBeast",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "tsx ./ --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrBoomDeveloper/HWBot.git"
+  },
+  "author": "MrBoomDev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrBoomDeveloper/HWBot/issues"
+  },
+  "homepage": "https://github.com/MrBoomDeveloper/HWBot#readme",
+  "devDependencies": {
+    "tsx": "^4.7.0"
+  }
+}
