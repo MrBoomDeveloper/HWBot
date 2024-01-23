@@ -1,16 +1,17 @@
 import { CommandEntry } from "../setup/commandsParser";
 
-export default function Details(): CommandEntry {
-	return {
-		description: "Проверить, работает ли бот",
+const PingCommand: CommandEntry = {
+	description: "Проверить, работает ли бот",
 
-		async execute(request) {
-			return {
-				replyTo: request.message.id,
-				message: {
-					text: "Понг!"
-				}
+	async execute(request) {
+		return {
+			doReply: true,
+			
+			message: {
+				text: "Понг!"
 			}
 		}
 	}
 }
+
+export default PingCommand;

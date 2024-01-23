@@ -32,7 +32,8 @@ export interface CommandRequest extends BaseCommand {
 
 export interface CommandResponse extends BaseCommand {
 	replyTo?: number,
-	chatId?: number
+	chatId?: number,
+	doReply?: boolean
 }
 
 export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
@@ -62,6 +63,10 @@ export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
 function fillEmptyFields(request: CommandRequest, response: CommandResponse) {
 	if(response.chatId == null) {
 		response.chatId = request.chat.id;
+	}
+
+	if(response.doReply == true && response.replyTo == null) {
+		response.replyTo = request.message.id;
 	}
 }
 

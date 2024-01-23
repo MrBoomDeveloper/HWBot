@@ -7,7 +7,8 @@ export interface CommandEntry {
 	execute: (request: CommandRequest) => Promise<CommandResponse>,
 	arguments?: string[],
 	description?: string,
-	isAdmin?: boolean
+	isAdmin?: boolean,
+	isHidden?: boolean
 }
 
 export async function parseCommands() {
@@ -16,20 +17,18 @@ export async function parseCommands() {
 
 	for(const commandFile of commandFiles) {
 		const command = await import(`../commands/${commandFile}`);
-		const defaultFunction = command.default;
+		const entry = command.default as CommandEntry;
 
-		if(defaultFunction == null) {
+		if(command.default == null) {
 			throw new Error(`Файл ${commandFile} не содержит команды!`);
 		}
 
-		const info = defaultFunction() as CommandEntry;
-
-		if(info.execute == null) {
+		if(entry.execute == null) {
 			throw new Error(`Файл ${commandFile} не содержит команды!`);
 		}
 
 		const commandName = commandFile.split(".")[0];
-		commands[commandName] = info;
+		commands[commandName] = entry;
 	}
 
 	console.info("Команды загружены успешно!");
@@ -37,4 +36,8 @@ export async function parseCommands() {
 
 export function getCommand(command: string): CommandEntry | null {
 	return commands[command] ?? null;
+}
+
+export function getCommands() {
+	return commands;
 }
