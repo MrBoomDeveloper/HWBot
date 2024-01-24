@@ -3,23 +3,40 @@ import { CommandEntry, addCommand } from "../data/commands";
 
 export async function parseCommands() {
 	const commandFiles = await listFiles("./src/commands/");
-	console.info(`Найдены следующие команды: ${commandFiles}`);
+	const failed: string[] = [];
+	const success: string[] = [];
 
 	for(const commandFile of commandFiles) {
-		const command = await import(`../commands/${commandFile}`);
-		const entry = command.default as CommandEntry;
+		let entry: CommandEntry;
 
-		if(command.default == null) {
-			throw new Error(`Файл ${commandFile} не содержит команды!`);
+		try {
+			const command = await import(`../commands/${commandFile}`);
+			entry = command.default as CommandEntry;
+		} catch(e) {
+			failed.push(`${commandFile} - ${e}`);
+			continue;
+		}
+
+		if(Object.values(entry).length == 0) {
+			failed.push(`${commandFile} - Не найден дескриптор команды`);
+			continue;
 		}
 
 		if(entry.execute == null) {
-			throw new Error(`Файл ${commandFile} не содержит команды!`);
+			failed.push(`${commandFile} - Не найдена функция execute для команды`);
+			continue;
 		}
 
 		const commandName = commandFile.split(".")[0];
 		addCommand(commandName, entry);
+		success.push(commandName);
 	}
 
-	console.info("Команды загружены успешно!");
+	if(success.length > 0) {
+		console.info("Успешно спарсены следующие команды:", success.join(", "));
+	}
+
+	if(failed.length > 0) {
+		console.error("Не удалось спарсить следующие команды:", failed.join(", "));
+	}
 }

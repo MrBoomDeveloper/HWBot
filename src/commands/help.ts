@@ -7,7 +7,7 @@ const HelpCommand: CommandEntry = {
 		const formatted = Object.entries(getCommands())
 			.filter(([key, value]) => !value.isHidden && !value.isAdmin && key != "help")
 			.map(([key, value]) => {
-				let result = `• ${key}`;
+				let result = `  /${key}`;
 
 				if(value.arguments != null && value.arguments.length > 0) {
 					result += ` [ ${value.arguments.join(", ")} ]`;
