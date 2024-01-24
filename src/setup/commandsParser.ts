@@ -1,15 +1,5 @@
 import { readdir as listFiles } from "fs/promises";
-import { CommandRequest, CommandResponse } from "../bridges/base";
-
-const commands: Record<string, CommandEntry> = {}
-
-export interface CommandEntry {
-	execute: (request: CommandRequest, args?: string[]) => Promise<CommandResponse>,
-	arguments?: string[],
-	description?: string,
-	isAdmin?: boolean,
-	isHidden?: boolean
-}
+import { CommandEntry, addCommand } from "../data/commands";
 
 export async function parseCommands() {
 	const commandFiles = await listFiles("./src/commands/");
@@ -28,16 +18,8 @@ export async function parseCommands() {
 		}
 
 		const commandName = commandFile.split(".")[0];
-		commands[commandName] = entry;
+		addCommand(commandName, entry);
 	}
 
 	console.info("Команды загружены успешно!");
-}
-
-export function getCommand(command: string): CommandEntry | null {
-	return commands[command] ?? null;
-}
-
-export function getCommands() {
-	return commands;
 }

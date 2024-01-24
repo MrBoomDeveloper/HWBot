@@ -1,4 +1,4 @@
-import { CommandEntry, getCommands } from "../setup/commandsParser"
+import { CommandEntry, getCommands } from "../data/commands";
 
 const HelpCommand: CommandEntry = {
 	description: "Вывести список команд",

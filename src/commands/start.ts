@@ -1,4 +1,4 @@
-import { CommandEntry } from "../setup/commandsParser";
+import { CommandEntry } from "../data/commands";
 import HelpCommand from "./help";
 
 const StartCommand: CommandEntry = {

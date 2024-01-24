@@ -1,4 +1,4 @@
-import { getCommand } from "../setup/commandsParser";
+import { CommandRequest, CommandResponse, Results, getCommand } from "../data/commands";
 import { logger } from "../util/logger";
 import { parseCommand } from "../util/parser";
 
@@ -7,38 +7,6 @@ export interface Bridge {
 	sendResponse(reponse: CommandResponse): Promise<void>,
 	getPrefix(): string | string[],
 	resolveFirstArgument?(arg1: string): string | null
-}
-
-interface BaseCommand {
-	message: {
-		text?: string,
-		photos?: string[]
-	}
-}
-
-export interface CommandRequest extends BaseCommand {
-	message: {
-		text?: string,
-		photos?: string[],
-		id: number
-	},
-
-	author: {
-		name: string,
-		username: string,
-		id: number
-	},
-
-	chat: {
-		id: number,
-		name: string
-	}
-}
-
-export interface CommandResponse extends BaseCommand {
-	replyTo?: number,
-	chatId?: number,
-	doReply?: boolean
 }
 
 export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
@@ -91,9 +59,4 @@ function fillEmptyFields(request: CommandRequest, response: CommandResponse) {
 	if(response.doReply == true && response.replyTo == null) {
 		response.replyTo = request.message.id;
 	}
-}
-
-export enum Results {
-	UNKNOWN_COMMAND = "Я не знаю такой команды, узнайте все команды через /help",
-	NULL_COMMAND = "Команда не была указанна"
 }

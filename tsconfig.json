@@ -10,7 +10,8 @@
 			"@web/*": ["./src/web/*"],
 			"@commands/*": ["./src/commands/*"],
 			"@bridges/*": ["./src/bridges/*"],
-			"@setup/*": ["./src/setup/*"]
+			"@setup/*": ["./src/setup/*"],
+			"@data/*": ["./src/data/*"]
 		}
 	}
 }

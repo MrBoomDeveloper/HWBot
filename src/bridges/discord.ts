@@ -1,4 +1,5 @@
-import { Bridge, CommandRequest, CommandResponse } from "./base";
+import { CommandRequest, CommandResponse } from "../data/commands";
+import { Bridge } from "./base";
 
 export class DiscordBridge implements Bridge {
 	async start() {

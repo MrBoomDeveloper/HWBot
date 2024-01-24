@@ -1,4 +1,5 @@
-import { Bridge, CommandRequest, CommandResponse, resolveRequest } from "./base";
+import { CommandRequest, CommandResponse } from "../data/commands";
+import { Bridge, resolveRequest } from "./base";
 import TelegramBot from "node-telegram-bot-api";
 
 export class TelegramBridge implements Bridge {
