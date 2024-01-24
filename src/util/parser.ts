@@ -13,7 +13,7 @@ export function parseCommand(text: string, prefix: string | string[]) {
 		selectedPrefix = prefix;
 	}
 
-	if(selectedPrefix == null) {
+	if(selectedPrefix == null || !args[0].startsWith(selectedPrefix)) {
 		return null;
 	}
 
