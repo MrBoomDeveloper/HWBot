@@ -17,4 +17,8 @@ export class VKBridge implements Bridge {
 	getPrefix(): string | string[] {
 		return "/";
 	}
+
+	async getFileLink(photoId: string): Promise<string> {
+		return `https://vk.com/photo${photoId}`
+	}
 }

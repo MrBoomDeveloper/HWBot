@@ -1,4 +1,4 @@
-import { CommandRequest, CommandResponse } from "../data/commands";
+import { CommandRequest, CommandResponse, RequestType } from "../data/commands";
 import { Bridge, resolveRequest } from "./base";
 import TelegramBot from "node-telegram-bot-api";
 
@@ -14,12 +14,17 @@ export class TelegramBridge implements Bridge {
 		this.token = token;
 	}
 
+	async getFileLink(photoId: string): Promise<string> {
+		return await this.client.getFileLink(photoId);
+	}
+
 	async start() {
 		this.client = new TelegramBot(this.token, { polling: true });
 
-		this.client.on("message", async (message) => {
-			resolveRequest(this, this.getRequest(message));
-		});
+		this.client.on("text", async (message) => resolveRequest(this, this.getRequest(message, "text")));
+		this.client.on("photo", async (message) => resolveRequest(this, this.getRequest(message, "photo")));
+		this.client.on("document", async (message) => resolveRequest(this, this.getRequest(message, "file")));
+		this.client.on("voice", async (message) => resolveRequest(this, this.getRequest(message, "voice")));
 
 		this.client.on("polling_error", (error) => {
 			if(error.message == CLONE_INSTANCE_ERROR) {
@@ -41,11 +46,14 @@ export class TelegramBridge implements Bridge {
 		});
 	}
 
-	getRequest(message: TelegramBot.Message): CommandRequest | null {
+	getRequest(message: TelegramBot.Message, type: RequestType): CommandRequest | null {
 		return {
+			type,
+
 			message: {
 				text: message.text,
-				id: message.message_id
+				id: message.message_id,
+				photos: message.photo?.map((photo) => photo.file_id)
 			},
 			
 			author: {

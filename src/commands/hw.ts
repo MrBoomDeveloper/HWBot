@@ -1,9 +1,9 @@
 import { CommandEntry } from "../data/commands";
 
 const HWCommand: CommandEntry = {
-	description: "Отправить всем дз",
+	description: "Получить все дз",
 
-	async execute(request, args) {
+	async execute() {
 		return {
 			doReply: true,
 			message: {

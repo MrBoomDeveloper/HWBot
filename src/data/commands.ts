@@ -1,3 +1,5 @@
+import { Bridge } from "../bridges/base"
+
 interface BaseCommand {
 	message: {
 		text?: string,
@@ -5,7 +7,11 @@ interface BaseCommand {
 	}
 }
 
+export type RequestType = "text" | "file" | "photo" | "voice";
+
 export interface CommandRequest extends BaseCommand {
+	type: RequestType,
+
 	message: {
 		text?: string,
 		photos?: string[],
@@ -32,8 +38,10 @@ export interface CommandResponse extends BaseCommand {
 
 const commands: Record<string, CommandEntry> = {}
 
+type CommandEntryExecute = (bridge: Bridge, request: CommandRequest, args?: string[]) => Promise<CommandResponse>;
+
 export interface CommandEntry {
-	execute: (request: CommandRequest, args?: string[]) => Promise<CommandResponse>,
+	execute: CommandEntryExecute,
 	arguments?: string[],
 	description?: string,
 	isAdmin?: boolean,

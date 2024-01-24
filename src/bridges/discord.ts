@@ -17,4 +17,8 @@ export class DiscordBridge implements Bridge {
 	getPrefix(): string | string[] {
 		return ["/", "hw!"];
 	}
+
+	async getFileLink(photoId: string): Promise<string> {
+		return null;
+	}
 }

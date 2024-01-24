@@ -3,7 +3,7 @@ import { CommandEntry, getCommands } from "../data/commands";
 const HelpCommand: CommandEntry = {
 	description: "Вывести список команд",
 
-	async execute(request) {
+	async execute() {
 		const formatted = Object.entries(getCommands())
 			.filter(([key, value]) => !value.isHidden && !value.isAdmin && key != "help")
 			.map(([key, value]) => {
