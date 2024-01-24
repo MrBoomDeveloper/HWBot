@@ -5,7 +5,7 @@ export async function initDb() {
 }
 
 async function createDirs() {
-	for(const dir of ["./.saved/schedules"]) {
+	for(const dir of ["./.saved/schedules", "./.saved/hw", "./.saved/db"]) {
 		try {
 			await mkdir(dir, { recursive: true });
 		} catch(e) {
