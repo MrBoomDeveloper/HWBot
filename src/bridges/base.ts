@@ -1,10 +1,12 @@
 import { getCommand } from "../setup/commandsParser";
+import { logger } from "../util/logger";
 import { parseCommand } from "../util/parser";
 
 export interface Bridge {
 	start(): Promise<void>;
 	sendResponse(reponse: CommandResponse): Promise<void>,
-	getPrefix(): string | string[]
+	getPrefix(): string | string[],
+	resolveFirstArgument?(arg1: string): string | null
 }
 
 interface BaseCommand {
@@ -23,6 +25,7 @@ export interface CommandRequest extends BaseCommand {
 
 	author: {
 		name: string,
+		username: string,
 		id: number
 	},
 
@@ -43,18 +46,21 @@ export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
 		return;
 	}
 
-	console.log(`Сообщение от ${request.author.name} (${request.author.id}): ${request.message.text}`);
+	logger.info(`Сообщение от ${request.author.name} (@${request.author.username}): ${request.message.text}`, bridge);
 
 	if(request.message.text == null) {
 		return;
 	}
 
 	const parsedCommand = parseCommand(request.message.text, bridge.getPrefix());
+	if(parsedCommand == null || parsedCommand.length == 0) return;
 
-	if(parsedCommand == null || parsedCommand.length == 0) {
-		return;
+	if(bridge.resolveFirstArgument != null) {
+		const resolvedFirstArgument = bridge.resolveFirstArgument(parsedCommand[0]);
+		if(resolvedFirstArgument == null) return;
+		parsedCommand[0] = resolvedFirstArgument;
 	}
-
+	
 	const foundCommand = getCommand(parsedCommand[0].toLowerCase());
 
 	const args = [...parsedCommand];

@@ -30,6 +30,11 @@ export class TelegramBridge implements Bridge {
 	}
 
 	async sendResponse(reponse: CommandResponse): Promise<void> {
+		if(reponse.message.photos != null) {
+			//await this.client.sendMediaGroup(reponse.chatId, reponse.message.photos);
+			throw new Error("Фото не поддерживаются.");
+		}
+
 		await this.client.sendMessage(reponse.chatId, reponse.message.text, {
 			reply_to_message_id: reponse.replyTo
 		});
@@ -44,7 +49,8 @@ export class TelegramBridge implements Bridge {
 			
 			author: {
 				id: message.from.id,
-				name: message.from.first_name
+				name: message.from.first_name,
+				username: message.from.username
 			},
 
 			chat: {
@@ -52,6 +58,18 @@ export class TelegramBridge implements Bridge {
 				id: message.chat.id
 			}
 		};
+	}
+
+	resolveFirstArgument(arg1: string): string | null {
+		const username = `@${process.env.TELEGRAM_BOT_USERNAME}`;
+
+		if(arg1.endsWith(username)) {
+			arg1 = arg1.substring(0, arg1.length - username.length);
+		} else if(arg1.includes("@")) {
+			return null;
+		}
+
+		return arg1;
 	}
 
 	getPrefix(): string | string[] {
