@@ -1,6 +1,8 @@
+import consola from "consola";
 import { CommandRequest, CommandResponse, RequestType } from "../data/commands";
 import { Bridge, resolveRequest } from "./base";
-import TelegramBot from "node-telegram-bot-api";
+import TelegramBot, { InputMedia } from "node-telegram-bot-api";
+import { readFile } from "node:fs/promises";
 
 export class TelegramBridge implements Bridge {
 	private client: TelegramBot;
@@ -33,16 +35,46 @@ export class TelegramBridge implements Bridge {
 
 			throw new Error("Телегам бот упал :(", { cause: error });
 		});
+
+		consola.success("Телеграм бот запущен!");
 	}
 
-	async sendResponse(reponse: CommandResponse): Promise<void> {
-		if(reponse.message.photos != null) {
-			//await this.client.sendMediaGroup(reponse.chatId, reponse.message.photos);
-			throw new Error("Фото не поддерживаются.");
+	async sendResponse(response: CommandResponse): Promise<void> {
+		if(response.message.photos != null) {
+			/**
+			 * Нам нужно напрямую отправлять картинки, однако предоставленный интерфейс 
+			 * не предоставляет возможности использовать буферы, лишь картинки. 
+			 * Однако имплементация поддерживает буферы, поэтому мы можем без указания типа использовать буферы.
+			 */
+
+			const photos = [];
+
+			for(let i = 0; i < response.message.photos.length; i++) {
+				const photo = response.message.photos[i];
+				const buffer = await readFile(`./.saved/schedules/${photo}`);
+
+				photos.push({
+					type: "photo",
+					media: buffer,
+					caption: ((i == 0) ? response.message.text : undefined)
+				});
+			}
+
+			// В телеграме используется ограничение на 10 картинок в одном сообщении
+			while(photos.length > 10) {
+				photos.pop();
+				consola.warn("Ограничение на 10 картинок в одном сообщениию. Лишние картинки были удалены.");
+			}
+
+			await this.client.sendMediaGroup(response.chatId, photos, {
+				reply_to_message_id: response.replyTo,
+			});
+
+			return;
 		}
 
-		await this.client.sendMessage(reponse.chatId, reponse.message.text, {
-			reply_to_message_id: reponse.replyTo
+		await this.client.sendMessage(response.chatId, response.message.text, {
+			reply_to_message_id: response.replyTo
 		});
 	}
 

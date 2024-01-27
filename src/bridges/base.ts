@@ -1,3 +1,4 @@
+import consola from "consola";
 import { CommandRequest, CommandResponse, Results, getCommand } from "../data/commands";
 import { logger } from "../util/logger";
 import { parseCommand } from "../util/parser";
@@ -67,7 +68,7 @@ export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
 		fillEmptyFields(request, response);
 		await bridge.sendResponse(response);
 	} catch(e) {
-		throw new Error(e);
+		consola.error(e);
 	}
 }
 

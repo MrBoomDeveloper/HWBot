@@ -1,9 +1,10 @@
+import consola from "consola";
 import { CommandRequest, CommandResponse } from "../data/commands";
 import { Bridge } from "./base";
 
 export class DiscordBridge implements Bridge {
 	async start() {
-		console.warn("Дискорд мост еще не сделан.");
+		consola.warn("Дискорд мост еще не сделан.");
 	}
 
 	getCommand(message: any): CommandRequest | null {

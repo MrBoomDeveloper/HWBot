@@ -2,8 +2,7 @@ import { Bridge } from "../bridges/base"
 
 interface BaseCommand {
 	message: {
-		text?: string,
-		photos?: string[]
+		text?: string
 	}
 }
 
@@ -31,6 +30,11 @@ export interface CommandRequest extends BaseCommand {
 }
 
 export interface CommandResponse extends BaseCommand {
+	message: {
+		text?: string,
+		photos?: string[]
+	},
+
 	replyTo?: number,
 	chatId?: number,
 	doReply?: boolean

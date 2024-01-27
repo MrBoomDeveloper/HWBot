@@ -1,5 +1,6 @@
 import { readdir as listFiles } from "fs/promises";
 import { CommandEntry, addCommand } from "../data/commands";
+import consola from "consola";
 
 export async function parseCommands() {
 	const commandFiles = await listFiles("./src/commands/");
@@ -33,10 +34,10 @@ export async function parseCommands() {
 	}
 
 	if(success.length > 0) {
-		console.info("Успешно спарсены следующие команды:", success.join(", "));
+		consola.info("Успешно спарсены следующие команды:", success.join(", "));
 	}
 
 	if(failed.length > 0) {
-		console.error("Не удалось спарсить следующие команды:", failed.join(", "));
+		consola.error(`Не удалось спарсить следующие команды: \n    ${failed.join("\n    ")}`);
 	}
 }
