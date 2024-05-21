@@ -31,18 +31,26 @@ const DoneEntry: CommandEntry = {
 				await removeCurrentUserOperation(request.author);
 
 				return {
-					doReply: true,
 					message: {
 						text: "Дз успешно опубликовано :)"
 					}
 				}
 			} break;
 
+			case UserOperationType.SUBSCRIBE: {
+				await removeCurrentUserOperation(request.author);
+
+				return {
+					message: {
+						text: "Ваши подписки сохранены."
+					}
+				}
+			}
+
 			default: {
 				return {
-					doReply: true,
 					message: {
-						text: "Не известная операция. Обратитесь в поддержку: @MrBoomDev. " + operation.type
+						text: "Неизвестная операция. Обратитесь в поддержку: @MrBoomDev. " + operation.type
 					}
 				}
 			}

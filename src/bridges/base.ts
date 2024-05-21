@@ -4,13 +4,15 @@ import { logger } from "../util/logger";
 import { parseCommand } from "../util/parser";
 import { writeFile } from "node:fs/promises";
 import { UserOperationType, getCurrentUserOperation } from "../data/operations";
+import { resolveButton } from "../commands/subscribe";
 
 export interface Bridge {
 	start(): Promise<void>;
 	sendResponse(reponse: CommandResponse): Promise<void>,
 	getPrefix(): string | string[],
 	resolveFirstArgument?(arg1: string): string | null,
-	getFileLink(photoId: string): Promise<string | null>
+	getFileLink(photoId: string): Promise<string | null>,
+	getPlatformName(): string
 }
 
 export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
@@ -48,6 +50,27 @@ export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
 					}
 				}
 		} break process;
+
+		case "button": {
+			let extra;
+
+			try {
+				extra = JSON.parse(request.button.id);
+			} catch(e) {
+				response = {
+					doReply: true,
+					message: { text: "Failed to parse extra data!" }
+				}
+
+				break process;
+			}
+
+			switch(extra.act) {
+				case "sub_select": {
+					await resolveButton(bridge, request);
+				} return;
+			}
+		} break;
 
 		case "photo": {
 			let operation = await getCurrentUserOperation(request.author);
@@ -102,7 +125,7 @@ export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
 	}
 }
 
-function fillEmptyFields(request: CommandRequest, response: CommandResponse) {
+export function fillEmptyFields(request: CommandRequest, response: CommandResponse) {
 	if(response.chatId == null) {
 		response.chatId = request.chat.id;
 	}
@@ -110,4 +133,6 @@ function fillEmptyFields(request: CommandRequest, response: CommandResponse) {
 	if(response.doReply == true && response.replyTo == null) {
 		response.replyTo = request.message.id;
 	}
+
+	return response;
 }

@@ -17,7 +17,7 @@ const AddHwCommand: CommandEntry = {
 			}
 		}
 
-		setCurrentUserOperation<PublishMessageOperation>(request.author.id, {
+		setCurrentUserOperation<PublishMessageOperation>(request.author, {
 			type: UserOperationType.PUBLISH_HOMEWORK,
 			data: {}
 		});

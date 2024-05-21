@@ -1,12 +1,12 @@
 import { Bridge } from "../bridges/base";
 import { CommandEntry, CommandRequest, CommandResponse } from "../data/commands";
-import { SetupOperation, getCurrentUserOperation, setCurrentUserOperation } from "../data/operations";
+import { OperationAs, UserOperationType, getCurrentUserOperation, setCurrentUserOperation } from "../data/operations";
 
 const SetupCommand: CommandEntry = {
 	description: "Авторизация",
 
 	async execute(bridge: Bridge, request: CommandRequest): Promise<CommandResponse> {
-		const operation = await getCurrentUserOperation<SetupOperation>(request.author.id);
+		const operation = await getCurrentUserOperation<OperationAs>(request.author);
 
 		if(operation != null) {
 			return {
@@ -17,8 +17,8 @@ const SetupCommand: CommandEntry = {
 			}
 		}
 
-		setCurrentUserOperation(request.author.id, {
-			type: "setup",
+		setCurrentUserOperation(request.author, {
+			type: UserOperationType.SETUP,
 			data: {}
 		});
 

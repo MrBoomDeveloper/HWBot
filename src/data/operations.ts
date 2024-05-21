@@ -1,14 +1,14 @@
 import { CommandRequestAuthor } from "./commands";
 
-export enum UserOperationType { 
-	PUBLISH_HOMEWORK, PUBLISH_SCHEDULE, SETUP 
+export enum UserOperationType {
+	PUBLISH_HOMEWORK, PUBLISH_SCHEDULE, SETUP, SUBSCRIBE
 }
 
 export interface OperationAs {
 	school?: string,
 	clazz?: string,
 	clazzSection?: string,
-	role?: "student" | "teacher"
+	role?: "student" | "teacher" | "guest"
 }
 
 export interface PublishMessageOperation extends OperationAs {
@@ -27,8 +27,8 @@ export async function getCurrentUserOperation<T>(user: CommandRequestAuthor): Pr
 	return currentOperations[user.id];
 }
 
-export async function setCurrentUserOperation<T>(userId: number, operation: UserOperation<T>) {
-	currentOperations[userId] = operation;
+export async function setCurrentUserOperation<T>(user: CommandRequestAuthor, operation: UserOperation<T>) {
+	currentOperations[user.id] = operation;
 }
 
 export async function removeCurrentUserOperation(user: CommandRequestAuthor) {

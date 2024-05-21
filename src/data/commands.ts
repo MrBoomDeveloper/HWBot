@@ -6,7 +6,7 @@ interface BaseCommand {
 	}
 }
 
-export type RequestType = "text" | "file" | "photo" | "voice";
+export type RequestType = "text" | "file" | "photo" | "voice" | "button";
 
 export interface CommandRequestAuthor {
 	name: string,
@@ -17,6 +17,7 @@ export interface CommandRequestAuthor {
 
 export interface CommandRequest extends BaseCommand {
 	type: RequestType,
+	button?: CommandButton,
 
 	message: {
 		text?: string,
@@ -40,7 +41,13 @@ export interface CommandResponse extends BaseCommand {
 
 	replyTo?: number,
 	chatId?: number,
-	doReply?: boolean
+	doReply?: boolean,
+	buttons?: CommandButton[]
+}
+
+export interface CommandButton {
+	text: string,
+	id: string
 }
 
 const commands: Record<string, CommandEntry> = {}

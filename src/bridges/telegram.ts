@@ -1,7 +1,7 @@
 import consola from "consola";
 import { CommandRequest, CommandResponse, RequestType } from "../data/commands";
 import { Bridge, resolveRequest } from "./base";
-import TelegramBot, { InputMedia } from "node-telegram-bot-api";
+import TelegramBot, { CallbackQuery, InputMedia } from "node-telegram-bot-api";
 import { readFile } from "node:fs/promises";
 
 export class TelegramBridge implements Bridge {
@@ -15,6 +15,10 @@ export class TelegramBridge implements Bridge {
 
 		this.token = token;
 	}
+	
+	getPlatformName(): string {
+		return "telegram";
+	}
 
 	async getFileLink(photoId: string): Promise<string> {
 		return await this.client.getFileLink(photoId);
@@ -27,6 +31,20 @@ export class TelegramBridge implements Bridge {
 		this.client.on("photo", async (message) => resolveRequest(this, this.getRequest(message, "photo")));
 		this.client.on("document", async (message) => resolveRequest(this, this.getRequest(message, "file")));
 		this.client.on("voice", async (message) => resolveRequest(this, this.getRequest(message, "voice")));
+
+		this.client.on("callback_query", async (query) => {
+			try {
+				await resolveRequest(this, this.getButtonRequest(query));
+				this.client.answerCallbackQuery(query.id);
+			} catch(e) {
+				consola.error("Не удалось выполнить кнопку :(", { cause: e });
+				
+				this.client.answerCallbackQuery(query.id, {
+					text: "Не удалось выполнить ваш запрос :(",
+					show_alert: true
+				});
+			}
+		});
 
 		this.client.on("polling_error", (error) => {
 			if(error.message == CLONE_INSTANCE_ERROR) {
@@ -63,7 +81,7 @@ export class TelegramBridge implements Bridge {
 			// В телеграме используется ограничение на 10 картинок в одном сообщении
 			while(photos.length > 10) {
 				photos.pop();
-				consola.warn("Ограничение на 10 картинок в одном сообщениию. Лишние картинки были удалены.");
+				consola.error("Ограничение на 10 картинок в одном сообщениию. Лишние картинки были удалены.");
 			}
 
 			await this.client.sendMediaGroup(response.chatId, photos, {
@@ -75,8 +93,38 @@ export class TelegramBridge implements Bridge {
 
 		await this.client.sendMessage(response.chatId, response.message.text, {
 			reply_to_message_id: response.replyTo,
-			parse_mode: "HTML"
+			parse_mode: "HTML",
+			reply_markup: response.buttons == null ? undefined : {
+				inline_keyboard: response.buttons.map((button) => [{ text: button.text, callback_data: button.id }])
+			}
 		});
+	}
+
+	getButtonRequest(callback: CallbackQuery): CommandRequest | null {
+		return {
+			type: "button",
+
+			message: {
+				id: callback.message.message_id
+			},
+
+			button: {
+				id: callback.data,
+				text: null
+			},
+
+			chat: {
+				name: callback.message.chat.title,
+				id: callback.message.chat.id
+			},
+
+			author: {
+				id: callback.from.id,
+				name: callback.from.first_name,
+				username: callback.from.username,
+				platform: "telegram"
+			}
+		}
 	}
 
 	getRequest(message: TelegramBot.Message, type: RequestType): CommandRequest | null {
