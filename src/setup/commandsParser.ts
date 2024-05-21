@@ -14,7 +14,7 @@ export async function parseCommands() {
 			const command = await import(`../commands/${commandFile}`);
 			entry = command.default as CommandEntry;
 		} catch(e) {
-			failed.push(`${commandFile} - ${e}`);
+			failed.push(`${commandFile} - ${e} - Не действительный скрипт`);
 			continue;
 		}
 

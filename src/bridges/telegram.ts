@@ -74,7 +74,8 @@ export class TelegramBridge implements Bridge {
 		}
 
 		await this.client.sendMessage(response.chatId, response.message.text, {
-			reply_to_message_id: response.replyTo
+			reply_to_message_id: response.replyTo,
+			parse_mode: "HTML"
 		});
 	}
 
@@ -91,7 +92,8 @@ export class TelegramBridge implements Bridge {
 			author: {
 				id: message.from.id,
 				name: message.from.first_name,
-				username: message.from.username
+				username: message.from.username,
+				platform: "telegram"
 			},
 
 			chat: {

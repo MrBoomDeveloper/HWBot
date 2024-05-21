@@ -3,7 +3,7 @@ import { CommandEntry, CommandRequest } from "../data/commands";
 import { mkdir } from "fs/promises";
 
 const ScheduleCommand: CommandEntry = {
-	description: "Отправить всем расписание",
+	description: "Отправить новое расписание",
 
 	async execute(bridge: Bridge, request: CommandRequest, args: string[]) {
 		return {

@@ -3,6 +3,7 @@ import { CommandRequest, CommandResponse, Results, getCommand } from "../data/co
 import { logger } from "../util/logger";
 import { parseCommand } from "../util/parser";
 import { writeFile } from "node:fs/promises";
+import { UserOperationType, getCurrentUserOperation } from "../data/operations";
 
 export interface Bridge {
 	start(): Promise<void>;
@@ -19,6 +20,7 @@ export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
 		return;
 	}
 
+	process:
 	switch(request.type) {
 		case "text": {
 			logger.info(`Сообщение от ${request.author.name} (@${request.author.username}): ${request.message.text}`, bridge);
@@ -45,23 +47,51 @@ export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
 						text: Results.UNKNOWN_COMMAND
 					}
 				}
-		} break;
+		} break process;
 
 		case "photo": {
-			const photo = request.message.photos[request.message.photos.length - 1];
-			const fileLink = await bridge.getFileLink(photo);
+			let operation = await getCurrentUserOperation(request.author);
 
-			const fetched = await fetch(fileLink);
-			const buffer = Buffer.from(await fetched.arrayBuffer());
-
-			writeFile(`./.saved/schedules/${photo}.jpg`, buffer);
-
-			response = {
-				message: {
-					text: "Фото не поддерживаются."
+			if(operation == null) {
+				response = {
+					message: {
+						text: "Вы еще не начали ни одной операции. Что мне делать с этими фотографиями?"
+					}
 				}
+
+				break process;
 			}
-		} break;
+
+			switch(operation.type) {
+				case UserOperationType.PUBLISH_HOMEWORK: {
+					for(const photo of request.message.photos) {
+						const fileLink = await bridge.getFileLink(photo);
+
+						const fetched = await fetch(fileLink);
+						const buffer = Buffer.from(await fetched.arrayBuffer());
+
+						writeFile(`./.saved/schedules/${photo}.jpg`, buffer);
+					}
+
+					response = {
+						doReply: true,
+						message: {
+							text: "Фото приняты. Не забудьте отправить <b><u>/done</u></b> когда закончите. Если передумали, отправьте <b><u>/cancel</b></u>"
+						}
+					}
+				} break process;
+
+				default: {
+					response = {
+						message: {
+							text: "Фотографии не подходят для текущей операции."
+						}
+					}
+	
+					break process;
+				}			
+			}
+		}	
 	}
 
 	try {

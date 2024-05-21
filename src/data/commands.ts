@@ -8,6 +8,13 @@ interface BaseCommand {
 
 export type RequestType = "text" | "file" | "photo" | "voice";
 
+export interface CommandRequestAuthor {
+	name: string,
+	username: string,
+	id: number,
+	platform: string
+}
+
 export interface CommandRequest extends BaseCommand {
 	type: RequestType,
 
@@ -17,11 +24,7 @@ export interface CommandRequest extends BaseCommand {
 		id: number
 	},
 
-	author: {
-		name: string,
-		username: string,
-		id: number
-	},
+	author: CommandRequestAuthor,
 
 	chat: {
 		id: number,
