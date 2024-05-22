@@ -1,13 +1,13 @@
 import dotenv from "dotenv";
 import { startAllBots } from "./src/setup/botsStarter";
 import { parseCommands } from "./src/setup/commandsParser";
-import { initDb } from "./src/setup/dbInit";
 import consola from "consola";
+import { checkExistence } from "./src/data/db";
 
 dotenv.config();
 consola.start("Запуск...");
 
-initDb()
+checkExistence()
 	.then(startAllBots)
 	.then(parseCommands)
 	.then(() => consola.success("Запуск завершен!"))

@@ -69,7 +69,7 @@ export class TelegramBridge implements Bridge {
 
 			for(let i = 0; i < response.message.photos.length; i++) {
 				const photo = response.message.photos[i];
-				const buffer = await readFile(`./.saved/schedules/${photo}`);
+				const buffer = await readFile(photo);
 
 				photos.push({
 					type: "photo",

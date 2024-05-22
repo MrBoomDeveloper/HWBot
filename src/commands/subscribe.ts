@@ -42,7 +42,7 @@ const SubscribeEntry: CommandEntry = {
 			users = JSON.parse(await readFile(`${PATH_PREFIX}/users.json`, "utf8"));
 		}
 
-		let subscribeOperation = (operation || { "type": UserOperationType.SUBSCRIBE }) as UserOperation<any>;
+		let subscribeOperation = (operation || { type: UserOperationType.SUBSCRIBE, data: [] }) as UserOperation<any>;
 		setCurrentUserOperation<any>(request.author, subscribeOperation);
 
 		let currentPath = getSelection(null, groups);
@@ -71,19 +71,30 @@ const SubscribeEntry: CommandEntry = {
 }
 
 export async function resolveButton(bridge: Bridge, request: CommandRequest) {
-	let groups;
+	let groups, users;
 
-	if(!existsSync(`${PATH_PREFIX}/groups.json`)) {
+	if(!existsSync(`${PATH_PREFIX}/users.json`) || !existsSync(`${PATH_PREFIX}/groups.json`)) {
 		groups = {};
+		users = {};
 
 		await mkdir(PATH_PREFIX, { recursive: true });
 		await writeFile(`${PATH_PREFIX}/groups.json`, "{}");
+		await writeFile(`${PATH_PREFIX}/users.json`, "{}");
 	} else {
 		groups = JSON.parse(await readFile(`${PATH_PREFIX}/groups.json`, "utf8"));
+		users = JSON.parse(await readFile(`${PATH_PREFIX}/users.json`, "utf8"));
 	}
 
 	const extra = JSON.parse(request.button.id);
 	const item = getSelectionItem(extra.path, groups);
+
+	const operation = await getCurrentUserOperation<any[]>(request.author);
+	operation.data.push(extra.path);
+
+	if(item.with != null) {
+		const path = extra.path as string;
+		operation.data.push(path.substring(0, path.lastIndexOf("_")) + "_" + item.with);
+	}
 
 	await bridge.sendResponse(fillEmptyFields(request, {
 		doReply: true,
@@ -95,10 +106,10 @@ export function getSelectionItem(path?: string, map?: any) {
 	//TODO: Make normal implementation!
 
 	switch(path) {
-		case "ru_tuymazi-seraf-1_10a": return map[0].items[0].items[0];
-		case "ru_tuymazi-seraf-1_10a_all": return map[0].items[0].items[0].items[0];
-		case "ru_tuymazi-seraf-1_10a_phis-mat": return map[0].items[0].items[0].items[1];
-		case "ru_tuymazi-seraf-1_10a_him-bio": return map[0].items[0].items[0].items[2];
+		case "bash_seraf1_10a": return map[0].items[0].items[0];
+		case "bash_seraf1_10a_all": return map[0].items[0].items[0].items[0];
+		case "bash_seraf1_10a_math-physics": return map[0].items[0].items[0].items[1];
+		case "bash_seraf1_10a_sci-bio": return map[0].items[0].items[0].items[2];
 		default: throw new Error("Unknown path: " + path);
 	}
 }

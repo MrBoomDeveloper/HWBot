@@ -3,7 +3,7 @@ import { CommandRequest, CommandResponse, Results, getCommand } from "../data/co
 import { logger } from "../util/logger";
 import { parseCommand } from "../util/parser";
 import { writeFile } from "node:fs/promises";
-import { UserOperationType, getCurrentUserOperation } from "../data/operations";
+import { PublishMessageOperation, UserOperationType, getCurrentUserOperation } from "../data/operations";
 import { resolveButton } from "../commands/subscribe";
 
 export interface Bridge {
@@ -87,19 +87,15 @@ export async function resolveRequest(bridge: Bridge, request: CommandRequest) {
 
 			switch(operation.type) {
 				case UserOperationType.PUBLISH_HOMEWORK: {
-					for(const photo of request.message.photos) {
-						const fileLink = await bridge.getFileLink(photo);
+					const publishHwOperation = operation.data as PublishMessageOperation;
 
-						const fetched = await fetch(fileLink);
-						const buffer = Buffer.from(await fetched.arrayBuffer());
-
-						writeFile(`./.saved/schedules/${photo}.jpg`, buffer);
-					}
+					if(publishHwOperation.photos == null) publishHwOperation.photos = [];
+					publishHwOperation.photos.push(request.message.photos[request.message.photos.length - 1]);
 
 					response = {
 						doReply: true,
 						message: {
-							text: "Фото приняты. Не забудьте отправить <b><u>/done</u></b> когда закончите. Если передумали, отправьте <b><u>/cancel</b></u>"
+							text: "Фото принято. Не забудьте отправить <b><u>/done</u></b> когда закончите. Если передумали, отправьте <b><u>/cancel</u></b>"
 						}
 					}
 				} break process;
